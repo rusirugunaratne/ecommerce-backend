@@ -11,9 +11,11 @@ npm i ts-node nodemon --save-dev (allows you to run TypeScript code directly in 
 ```
 
 ## Prisma
+
 ```
 npm i prisma @prisma/client
 npx prisma init
-create the schemas and then run 
+create the schemas and then run
 npx prisma migrate dev --name CreateUserTable
+npx prisma studio (for editing and viewing data)
 ```
