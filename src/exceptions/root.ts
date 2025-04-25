@@ -4,12 +4,7 @@ export class HttpException extends Error {
   statusCode: number;
   errors: any;
 
-  constructor(
-    message: string,
-    errorCode: ErrorCode,
-    statusCode: number,
-    errors: any
-  ) {
+  constructor(message: string, errorCode: ErrorCode, statusCode: number, errors: any) {
     super(message);
     this.message = message;
     this.errorCode = errorCode;
@@ -25,4 +20,5 @@ export enum ErrorCode {
   UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY",
   INTERNAL_EXCEPTION = "INTERNAL_EXCEPTION",
   UNAUTHORIZED = "UNAUTHORIZED",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
 }

@@ -3,26 +3,29 @@ import { UnauthorizedException } from "../exceptions/unauthorized";
 import * as jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../secrets";
 import { prismaClient } from "..";
+import { ErrorCode } from "../exceptions/root";
 
-const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      next(new UnauthorizedException());
-    }
-    const token = authHeader!.split(" ")[1];
-    const payload = jwt.verify(token!, JWT_SECRET) as any;
-    const user = await prismaClient.user.findFirst({
-      where: {
-        id: payload.userId,
-      },
+    if (!authHeader?.startsWith("Bearer ")) throw new UnauthorizedException();
+
+    const token = authHeader.split(" ")[1];
+    const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as { userId: number };
+
+    const user = await prismaClient.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, email: true, role: true },
     });
-    if (!user) {
-      next(new UnauthorizedException());
-    }
-    req.user = user!;
+
+    if (!user) throw new UnauthorizedException();
+
+    req.user = user;
     next();
   } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return next(new UnauthorizedException());
+    }
     next(new UnauthorizedException());
   }
 };
